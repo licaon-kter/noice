@@ -1,5 +1,6 @@
 package com.github.ashutoshgngwr.noice.sound.player
 
+import com.github.ashutoshgngwr.noice.sound.PlaybackManager
 import com.github.ashutoshgngwr.noice.sound.Sound
 import com.google.android.gms.cast.framework.CastSession
 import com.google.gson.GsonBuilder
@@ -15,15 +16,6 @@ class CastSoundPlayer(
   sound: Sound
 ) : SoundPlayer() {
 
-  /**
-   * [State] denotes all possible states that [CastSoundPlayer] can be in at any given instant.
-   * This enum is private to CastSoundPlayer but its visibility is public because Gson needs to
-   * access it.
-   */
-  enum class State {
-    PLAYING, PAUSED, STOPPED
-  }
-
   @Expose
   @Suppress("unused")
   val soundKey = sound.key
@@ -37,35 +29,39 @@ class CastSoundPlayer(
     private set
 
   @Expose
-  var state = State.STOPPED
+  var state = PlaybackManager.State.STOPPED
 
   private val gson = GsonBuilder()
     .excludeFieldsWithoutExposeAnnotation()
     .create()
 
   override fun setVolume(volume: Float) {
+    if (this.volume == volume) {
+      return
+    }
+
     this.volume = volume
 
     // since volume update will only take effect during the PLAYING state, it would be
     // redundant to send updates for others. Once the player comes back to PLAYING state
     // the volume will be updated along with state update.
-    if (state == State.PLAYING) {
+    if (state == PlaybackManager.State.PLAYING) {
       notifyChanges()
     }
   }
 
   override fun play() {
-    this.state = State.PLAYING
+    this.state = PlaybackManager.State.PLAYING
     notifyChanges()
   }
 
   override fun pause() {
-    this.state = State.PAUSED
+    this.state = PlaybackManager.State.PAUSED
     notifyChanges()
   }
 
   override fun stop() {
-    this.state = State.STOPPED
+    this.state = PlaybackManager.State.STOPPED
     notifyChanges()
   }
 

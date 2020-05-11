@@ -32,7 +32,7 @@
   @com.google.gson.annotations.Expose <fields>;
 }
 
-# keep enum fields for CastMediaPlayer.State
--keepclassmembers enum com.github.ashutoshgngwr.noice.sound.player.CastMediaPlayer$State {
+# keep enum fields for PlaybackManager.State (used in CastSoundPlayer)
+-keepclassmembers enum com.github.ashutoshgngwr.noice.sound.PlaybackManager$State {
   <fields>;
 }
